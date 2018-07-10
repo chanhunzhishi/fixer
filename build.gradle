@@ -1,0 +1,61 @@
+buildscript {
+    ext {
+        springBootVersion = '2.0.3.RELEASE'
+    }
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:${springBootVersion}")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+apply plugin: 'maven-publish'
+apply plugin: 'maven'
+
+group = 'cn.chanhunzhishi'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = 1.8
+
+repositories {
+    mavenCentral()
+}
+
+
+dependencies {
+    compile('org.springframework.boot:spring-boot-starter-websocket')
+    testCompile('org.springframework.boot:spring-boot-starter-test')
+}
+publishing {
+    publications {
+        maven(MavenPublication) {
+            //指定group/artifact/version信息，可以不填。默认使用项目group/name/version作为groupId/artifactId/version
+            groupId project.group
+            artifactId project.name
+            version project.version
+            //如果是war包填写components.web，如果是jar包填写components.java
+            from components.java
+        }
+    }
+    repositories {
+        maven {
+            //指定要上传的maven私服仓库
+            url = "http://www.chanhunzhishi.cn:9069/repository/nexus-releases/"
+            if(version.endsWith("-SNAPSHOT")) {
+                url ="http://www.chanhunzhishi.cn:9069/repository/nexus-snapshots/"
+            }
+            //认证用户和密码
+            credentials {
+                //引入外部配置文件
+                Properties props = new Properties()
+                props.load(new FileInputStream(file("./authinfo.properties")))
+                username props.getProperty('MAVEN_USERNAME')
+                password props.get('MAVEN_PASSWORD')
+            }
+        }
+    }
+}

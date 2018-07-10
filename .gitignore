@@ -1,0 +1,9 @@
+.gradle/
+fixer.iml
+gradlew
+gradlew.bat
+.idea/
+*.iml
+gradle/
+
+
